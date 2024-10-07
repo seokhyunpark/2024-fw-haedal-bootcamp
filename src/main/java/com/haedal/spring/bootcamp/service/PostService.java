@@ -4,6 +4,7 @@ import com.haedal.spring.bootcamp.domain.Post;
 import com.haedal.spring.bootcamp.domain.User;
 import com.haedal.spring.bootcamp.dto.response.PostResponseDto;
 import com.haedal.spring.bootcamp.dto.response.UserSimpleResponseDto;
+import com.haedal.spring.bootcamp.repository.LikeRepository;
 import com.haedal.spring.bootcamp.repository.PostRepository;
 import com.haedal.spring.bootcamp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,15 @@ public class PostService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ImageService imageService;
+    private final LikeRepository likeRepository;
 
     @Autowired
-    public PostService(PostRepository postRepository, UserRepository userRepository, UserService userService, ImageService imageService) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, UserService userService, ImageService imageService, LikeRepository likeRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.imageService = imageService;
+        this.likeRepository = likeRepository;
     }
 
 
@@ -54,8 +57,8 @@ public class PostService {
                 userSimpleResponseDto,
                 imageData,
                 post.getContent(),
-                0L,
-                false,
+                likeRepository.countByPost(post),
+                likeRepository.existsByUserAndPost(currentUser, post),
                 post.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm"))
         );
     }
